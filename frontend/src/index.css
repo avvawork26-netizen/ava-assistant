@@ -3,44 +3,65 @@
 @tailwind utilities;
 
 @layer base {
+  *, *::before, *::after { border-radius: 0 !important; box-sizing: border-box; }
   body {
-    @apply bg-surface-900 text-surface-100 font-sans antialiased;
+    background: #080808;
+    color: #d8d8d8;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
   }
-
-  ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { @apply bg-transparent; }
-  ::-webkit-scrollbar-thumb { @apply bg-surface-600 rounded-full; }
-  ::-webkit-scrollbar-thumb:hover { @apply bg-surface-500; }
+  ::-webkit-scrollbar { width: 3px; height: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1e1e1e; }
+  ::selection { background: rgba(74,158,255,0.15); }
 }
 
 @layer components {
-  /* Status badges */
-  .badge-hot  { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20; }
-  .badge-warm { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20; }
-  .badge-cold { @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20; }
+  .card { background: #111111; border: 1px solid #1e1e1e; }
 
-  /* Intent badges */
-  .badge-buy     { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20; }
-  .badge-sell    { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20; }
-  .badge-rent    { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-sky-500/10 text-sky-400 border border-sky-500/20; }
-  .badge-invest  { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent-500/10 text-accent-400 border border-accent-500/20; }
-  .badge-unknown { @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-surface-700 text-surface-400 border border-surface-600; }
+  .badge-hot    { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:#0c1d33; color:#4A9EFF; border:1px solid #172d4d; }
+  .badge-warm   { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:#161616; color:#505050; border:1px solid #222222; }
+  .badge-cold   { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:transparent; color:#333333; border:1px solid #1e1e1e; }
+  .badge-buy    { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:#0c1d33; color:#4A9EFF; border:1px solid #172d4d; }
+  .badge-sell   { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:transparent; color:#484848; border:1px solid #1e1e1e; }
+  .badge-rent   { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:transparent; color:#484848; border:1px solid #1e1e1e; }
+  .badge-invest { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:transparent; color:#484848; border:1px solid #1e1e1e; }
+  .badge-unknown{ @apply inline-flex items-center px-2 py-0.5 text-xs font-medium uppercase tracking-wide; background:transparent; color:#303030; border:1px solid #1a1a1a; }
 
-  /* Card */
-  .card { @apply bg-surface-800 rounded-lg border border-surface-700; }
+  .btn-primary {
+    @apply px-4 py-2 text-xs font-medium transition-colors uppercase tracking-wider;
+    background:#4A9EFF; color:#000; border:none;
+  }
+  .btn-primary:hover { background:#6ab2ff; }
 
-  /* Buttons */
-  .btn-primary { @apply px-4 py-2 bg-surface-100 hover:bg-white text-surface-900 text-sm font-medium rounded transition-colors; }
-  .btn-ghost   { @apply px-4 py-2 text-surface-400 hover:text-surface-100 hover:bg-surface-700 text-sm font-medium rounded transition-colors; }
-  .btn-accent  { @apply px-4 py-2 bg-accent-500 hover:bg-accent-400 text-white text-sm font-semibold rounded transition-colors; }
+  .btn-ghost {
+    @apply px-3 py-1.5 text-xs font-medium transition-colors;
+    background:transparent; color:#484848; border:1px solid #1e1e1e;
+  }
+  .btn-ghost:hover { border-color:#2e2e2e; color:#d8d8d8; }
 
-  /* Chat bubbles */
-  .bubble-user      { @apply bg-surface-100 text-surface-900 rounded-xl rounded-br-sm px-4 py-2.5 max-w-sm text-sm leading-relaxed; }
-  .bubble-assistant { @apply bg-surface-700 border border-surface-600 text-surface-100 rounded-xl rounded-bl-sm px-4 py-2.5 max-w-sm text-sm leading-relaxed; }
+  .btn-dim {
+    @apply px-4 py-2 text-xs font-medium transition-colors uppercase tracking-wider;
+    background:#0c1d33; color:#4A9EFF; border:1px solid #172d4d;
+  }
+  .btn-dim:hover { background:#0f2540; }
+
+  .label { @apply font-medium tracking-widest uppercase; color:#404040; font-size:9px; }
+
+  .bubble-user      { background:#4A9EFF; color:#000; padding:9px 13px; max-width:22rem; font-size:0.8125rem; line-height:1.55; }
+  .bubble-assistant { background:#111111; color:#d8d8d8; border:1px solid #1e1e1e; padding:9px 13px; max-width:22rem; font-size:0.8125rem; line-height:1.55; }
+
+  .input {
+    @apply w-full px-3 py-2 text-sm transition-colors;
+    background:#0d0d0d; color:#d8d8d8; border:1px solid #1e1e1e; outline:none;
+  }
+  .input:focus { border-color:#4A9EFF; }
+  .input::placeholder { color:#303030; }
 }
 
-@keyframes escalation-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
-  50%       { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+@keyframes esc-pulse {
+  0%,100% { border-color:rgba(74,158,255,0.25); }
+  50%      { border-color:rgba(74,158,255,0.7); }
 }
-.escalation-pulse { animation: escalation-pulse 2s ease-in-out infinite; }
+.esc-pulse { animation:esc-pulse 2s ease-in-out infinite; }

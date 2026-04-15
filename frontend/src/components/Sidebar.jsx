@@ -2,68 +2,57 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const NAV = [
-  { to: '/',              label: 'Dashboard'     },
-  { to: '/leads',         label: 'Leads'         },
+  { to: '/',              label: 'Dashboard' },
+  { to: '/leads',         label: 'Leads' },
   { to: '/conversations', label: 'Conversations' },
-  { to: '/appointments',  label: 'Appointments'  },
-  { to: '/followups',     label: 'Follow-ups'    },
+  { to: '/appointments',  label: 'Appointments' },
+  { to: '/followups',     label: 'Follow-ups' },
 ];
 
 export default function Sidebar() {
   return (
-    <aside className="w-56 flex-shrink-0 bg-surface-950 border-r border-surface-800 flex flex-col">
+    <aside className="w-52 flex-shrink-0 flex flex-col" style={{ background:'#0d0d0d', borderRight:'1px solid #1e1e1e' }}>
       {/* Logo */}
-      <div className="px-5 pt-7 pb-6 border-b border-surface-800">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded bg-accent-500 flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-bold tracking-tight">AVA</span>
-          </div>
-          <div>
-            <div className="text-sm font-semibold text-surface-100 leading-tight tracking-tight">Ava</div>
-            <div className="text-xs text-surface-500 leading-tight">AI Realtor Assistant</div>
-          </div>
-        </div>
-        <div className="mt-4 px-2.5 py-1.5 bg-surface-800 rounded border border-surface-700">
-          <p className="text-xs text-surface-400">
-            <span className="text-accent-400 font-medium">Ayoub</span>
-            {' '}· Orlando & Florida Coast
-          </p>
-        </div>
+      <div className="px-5 pt-7 pb-5" style={{ borderBottom:'1px solid #1e1e1e' }}>
+        <div style={{ fontSize:17, fontWeight:300, letterSpacing:'0.3em', color:'#ffffff', textTransform:'uppercase' }}>Ava</div>
+        <div style={{ fontSize:9.5, fontWeight:400, letterSpacing:'0.12em', color:'#404040', textTransform:'uppercase', marginTop:4 }}>AI Realtor Assistant</div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 py-3">
         {NAV.map(({ to, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              `flex items-center px-3 py-2 rounded text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-surface-700 text-surface-100'
-                  : 'text-surface-500 hover:bg-surface-800 hover:text-surface-300'
-              }`
-            }
+          <NavLink key={to} to={to} end={to === '/'}
+            style={({ isActive }) => ({
+              display:'flex', alignItems:'center', padding:'8px 20px',
+              fontSize:12, fontWeight: isActive ? 500 : 400, letterSpacing:'0.03em',
+              color: isActive ? '#f0f0f0' : '#484848',
+              background: isActive ? '#141414' : 'transparent',
+              borderLeft: isActive ? '2px solid #4A9EFF' : '2px solid transparent',
+              textDecoration:'none', transition:'color 0.15s',
+            })}
           >
             {label}
           </NavLink>
         ))}
       </nav>
 
-      {/* Chat widget link */}
-      <div className="px-4 pb-6">
-        <a
-          href="/chat"
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center justify-center w-full py-2 rounded border border-surface-700 text-surface-400 hover:bg-surface-800 hover:text-surface-200 text-xs font-medium transition-colors tracking-wide uppercase"
+      {/* Bottom */}
+      <div className="px-4 pb-5" style={{ borderTop:'1px solid #1e1e1e', paddingTop:14 }}>
+        <a href="/chat" target="_blank" rel="noreferrer"
+          style={{
+            display:'flex', alignItems:'center', justifyContent:'center',
+            width:'100%', padding:'7px 0', fontSize:10, fontWeight:400,
+            letterSpacing:'0.1em', color:'#585858', textTransform:'uppercase',
+            textDecoration:'none', border:'1px solid #242424', background:'transparent',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color='#888'; e.currentTarget.style.borderColor='#333'; }}
+          onMouseLeave={e => { e.currentTarget.style.color='#585858'; e.currentTarget.style.borderColor='#242424'; }}
         >
           Open Chat Widget
         </a>
-        <div className="flex items-center justify-center gap-1.5 mt-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <p className="text-xs text-surface-600">Ava online</p>
+        <div style={{ display:'flex', alignItems:'center', gap:7, marginTop:10 }}>
+          <span style={{ width:5, height:5, borderRadius:'50%', background:'#4A9EFF', flexShrink:0 }} />
+          <span style={{ fontSize:10, color:'#404040', letterSpacing:'0.04em' }}>Ava online</span>
         </div>
       </div>
     </aside>

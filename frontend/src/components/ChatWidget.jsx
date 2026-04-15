@@ -2,180 +2,132 @@ import React, { useState, useRef, useEffect } from 'react';
 import { api } from '../api/client';
 
 function formatTime(dt) {
-  return new Date(dt || Date.now()).toLocaleTimeString('en-US', {
-    hour: 'numeric', minute: '2-digit', hour12: true,
-  });
+  return new Date(dt||Date.now()).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
 }
 
 function ChatUI({ leadId: initialLeadId, onLeadCreated }) {
   const [messages, setMessages] = useState([]);
-  const [input, setInput]       = useState('');
-  const [leadId, setLeadId]     = useState(initialLeadId || null);
-  const [lead, setLead]         = useState(null);
-  const [phase, setPhase]       = useState(initialLeadId ? 'chatting' : 'intro');
-  const [formData, setFormData] = useState({ name: '', phone: '' });
-  const [sending, setSending]   = useState(false);
+  const [input, setInput] = useState('');
+  const [leadId, setLeadId] = useState(initialLeadId||null);
+  const [lead, setLead] = useState(null);
+  const [phase, setPhase] = useState(initialLeadId?'chatting':'intro');
+  const [formData, setFormData] = useState({name:'',phone:''});
+  const [sending, setSending] = useState(false);
   const bottomRef = useRef(null);
 
-  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+  useEffect(()=>{ bottomRef.current?.scrollIntoView({behavior:'smooth'}); },[messages]);
 
-  useEffect(() => {
-    if (initialLeadId) {
-      Promise.all([api.getLead(initialLeadId), api.getConversation(initialLeadId)])
-        .then(([lead, msgs]) => {
-          setLead(lead);
-          setMessages(msgs.map((m) => ({ role: m.role, text: m.message, time: m.created_at })));
-        }).catch(console.error);
+  useEffect(()=>{
+    if(initialLeadId){
+      Promise.all([api.getLead(initialLeadId),api.getConversation(initialLeadId)])
+        .then(([l,msgs])=>{ setLead(l); setMessages(msgs.map(m=>({role:m.role,text:m.message,time:m.created_at}))); })
+        .catch(console.error);
     }
-  }, [initialLeadId]);
+  },[initialLeadId]);
 
   async function startChat(e) {
     e.preventDefault();
-    if (!formData.name.trim()) return;
-    setPhase('chatting');
-    setSending(true);
+    if(!formData.name.trim()) return;
+    setPhase('chatting'); setSending(true);
     try {
-      const res = await api.chat({
-        name: formData.name.trim(),
-        phone: formData.phone.trim() || undefined,
-        message: `Hi! My name is ${formData.name.trim()} and I'm interested in Florida real estate.`,
-      });
-      setLeadId(res.leadId);
-      setLead(res.lead);
-      if (onLeadCreated) onLeadCreated(res.leadId);
+      const res = await api.chat({ name:formData.name.trim(), phone:formData.phone.trim()||undefined,
+        message:`Hi! My name is ${formData.name.trim()} and I'm interested in Florida real estate.` });
+      setLeadId(res.leadId); setLead(res.lead);
+      if(onLeadCreated) onLeadCreated(res.leadId);
       setMessages([
-        { role: 'user',      text: `Hi! My name is ${formData.name.trim()} and I'm interested in Florida real estate.`, time: new Date().toISOString() },
-        { role: 'assistant', text: res.response, time: new Date().toISOString() },
+        {role:'user',text:`Hi! My name is ${formData.name.trim()} and I'm interested in Florida real estate.`,time:new Date().toISOString()},
+        {role:'assistant',text:res.response,time:new Date().toISOString()},
       ]);
-    } catch (err) { console.error(err); }
-    finally { setSending(false); }
+    } catch(err){ console.error(err); } finally{ setSending(false); }
   }
 
   async function sendMessage(e) {
     e.preventDefault();
-    if (!input.trim() || sending) return;
-    const userMsg = input.trim();
-    setInput('');
-    setSending(true);
-    setMessages((prev) => [...prev, { role: 'user', text: userMsg, time: new Date().toISOString() }]);
+    if(!input.trim()||sending) return;
+    const msg=input.trim(); setInput(''); setSending(true);
+    setMessages(p=>[...p,{role:'user',text:msg,time:new Date().toISOString()}]);
     try {
-      const res = await api.chat({ leadId, message: userMsg });
+      const res=await api.chat({leadId,message:msg});
       setLead(res.lead);
-      setMessages((prev) => [...prev, { role: 'assistant', text: res.response, time: new Date().toISOString() }]);
-    } catch {
-      setMessages((prev) => [...prev, { role: 'assistant', text: "I ran into a technical issue. Please try again in a moment.", time: new Date().toISOString() }]);
-    } finally { setSending(false); }
+      setMessages(p=>[...p,{role:'assistant',text:res.response,time:new Date().toISOString()}]);
+    } catch(err){
+      setMessages(p=>[...p,{role:'assistant',text:"I ran into a technical issue. Please try again in a moment!",time:new Date().toISOString()}]);
+    } finally{ setSending(false); }
   }
 
-  // Intro screen
-  if (phase === 'intro') {
-    return (
-      <div className="flex flex-col h-full bg-surface-900">
-        <div className="bg-surface-800 border-b border-surface-700 px-6 pt-8 pb-8 text-center">
-          <div className="w-12 h-12 rounded bg-accent-500 flex items-center justify-center text-white text-sm font-bold mx-auto mb-4 tracking-tight">
-            AVA
-          </div>
-          <h2 className="text-xl font-semibold text-surface-100 mb-1">Hi, I'm Ava</h2>
-          <p className="text-surface-400 text-sm leading-relaxed">
-            AI real estate assistant for Ayoub Realty<br />
-            Orlando, Clearwater & the Florida Coast
-          </p>
-        </div>
-        <div className="flex-1 px-6 py-6 bg-surface-900">
-          <p className="text-surface-300 font-medium mb-4 text-sm">Let's get started</p>
-          <form onSubmit={startChat} className="space-y-3">
-            <div>
-              <label className="block text-xs font-medium text-surface-500 mb-1 uppercase tracking-widest">Your name *</label>
-              <input
-                type="text" required placeholder="Sarah Johnson"
-                value={formData.name}
-                onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                className="w-full px-3 py-2.5 bg-surface-800 border border-surface-700 rounded text-sm text-surface-200 placeholder-surface-600 focus:outline-none focus:border-surface-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-surface-500 mb-1 uppercase tracking-widest">Phone (optional)</label>
-              <input
-                type="tel" placeholder="(407) 555-0100"
-                value={formData.phone}
-                onChange={(e) => setFormData((p) => ({ ...p, phone: e.target.value }))}
-                className="w-full px-3 py-2.5 bg-surface-800 border border-surface-700 rounded text-sm text-surface-200 placeholder-surface-600 focus:outline-none focus:border-surface-500"
-              />
-            </div>
-            <button type="submit" className="w-full py-2.5 bg-surface-100 hover:bg-white text-surface-900 font-semibold rounded text-sm mt-2 transition-colors">
-              Start Chat
-            </button>
-          </form>
-          <p className="text-center text-xs text-surface-600 mt-5">Powered by Ayoub Realty · Orlando & Florida Coast</p>
-        </div>
+  if(phase==='intro') return (
+    <div className="flex flex-col h-full" style={{ background:'#080808' }}>
+      <div className="px-6 pt-8 pb-8 text-center" style={{ background:'#0d0d0d', borderBottom:'1px solid #1e1e1e' }}>
+        <div style={{ fontSize:22, fontWeight:300, letterSpacing:'0.3em', color:'#ffffff', textTransform:'uppercase', marginBottom:6 }}>Ava</div>
+        <p style={{ fontSize:11, color:'#404040', letterSpacing:'0.08em' }}>AI Real Estate Guide · Orlando, Clearwater &amp; Florida Coast</p>
       </div>
-    );
-  }
+      <div className="flex-1 px-6 py-6" style={{ background:'#080808' }}>
+        <p style={{ fontSize:9, fontWeight:500, letterSpacing:'0.12em', color:'#404040', textTransform:'uppercase', textAlign:'center', marginBottom:16 }}>Get started</p>
+        <form onSubmit={startChat} className="space-y-3">
+          <div>
+            <label style={{ fontSize:9, fontWeight:500, letterSpacing:'0.1em', color:'#404040', textTransform:'uppercase', display:'block', marginBottom:5 }}>Your name *</label>
+            <input type="text" required placeholder="e.g. Sarah Johnson" value={formData.name}
+              onChange={e=>setFormData(p=>({...p,name:e.target.value}))} className="input" />
+          </div>
+          <div>
+            <label style={{ fontSize:9, fontWeight:500, letterSpacing:'0.1em', color:'#404040', textTransform:'uppercase', display:'block', marginBottom:5 }}>Phone number (optional)</label>
+            <input type="tel" placeholder="e.g. (407) 555-0100" value={formData.phone}
+              onChange={e=>setFormData(p=>({...p,phone:e.target.value}))} className="input" />
+          </div>
+          <button type="submit" className="btn-primary w-full py-3 mt-2">Start Chat</button>
+        </form>
+        <p style={{ textAlign:'center', fontSize:10, color:'#303030', marginTop:16 }}>Powered by Ayoub Realty · Orlando &amp; Florida Coast</p>
+      </div>
+    </div>
+  );
 
-  // Chat screen
   return (
-    <div className="flex flex-col h-full bg-surface-900">
-      <div className="bg-surface-800 border-b border-surface-700 px-4 py-3 flex items-center gap-3">
-        <div className="w-8 h-8 rounded bg-accent-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-          AVA
-        </div>
+    <div className="flex flex-col h-full" style={{ background:'#080808' }}>
+      <div className="px-4 py-3 flex items-center gap-3" style={{ background:'#0d0d0d', borderBottom:'1px solid #1e1e1e' }}>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-surface-100 text-sm">Ava</p>
-          <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <p className="text-surface-500 text-xs">AI Assistant · Ayoub Realty</p>
+          <p style={{ fontSize:14, fontWeight:300, letterSpacing:'0.2em', color:'#ffffff', textTransform:'uppercase' }}>Ava</p>
+          <div className="flex items-center gap-1.5" style={{ marginTop:2 }}>
+            <span style={{ width:5, height:5, borderRadius:'50%', background:'#4A9EFF', flexShrink:0 }} />
+            <p style={{ fontSize:10, color:'#4A9EFF' }}>Online · Ayoub Realty</p>
           </div>
         </div>
-        {lead?.escalation_ready === 1 && (
-          <span className="text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded font-medium">
-            Escalated
-          </span>
+        {lead?.escalation_ready===1 && (
+          <span style={{ fontSize:9, padding:'2px 8px', letterSpacing:'0.08em', textTransform:'uppercase', background:'#0c1d33', color:'#4A9EFF', border:'1px solid #172d4d' }}>Escalated</span>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {messages.length === 0 && (
-          <p className="text-center text-surface-600 py-8 text-sm">Say hello to get started</p>
-        )}
-        {messages.map((msg, i) => (
-          <div key={i} className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <div className="w-6 h-6 rounded bg-accent-500 flex items-center justify-center text-white text-xs font-bold shrink-0 mb-0.5">A</div>
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3" style={{ background:'#080808' }}>
+        {messages.length===0 && <p className="text-center py-8" style={{ fontSize:11, color:'#404040' }}>Say hello to get started.</p>}
+        {messages.map((msg,i) => (
+          <div key={i} className={`flex items-end gap-2 ${msg.role==='user'?'justify-end':'justify-start'}`}>
+            {msg.role==='assistant' && (
+              <div className="w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0 mb-0.5"
+                style={{ background:'#0c1d33', color:'#4A9EFF' }}>A</div>
             )}
             <div className="max-w-[80%]">
-              <div className={msg.role === 'user' ? 'bubble-user' : 'bubble-assistant'}>{msg.text}</div>
-              <p className={`text-xs text-surface-600 mt-1 ${msg.role === 'user' ? 'text-right' : ''}`}>{formatTime(msg.time)}</p>
+              <div className={msg.role==='user'?'bubble-user':'bubble-assistant'}>{msg.text}</div>
+              <p className={`mt-1 ${msg.role==='user'?'text-right':''}`} style={{ fontSize:10, color:'#404040' }}>{formatTime(msg.time)}</p>
             </div>
           </div>
         ))}
         {sending && (
           <div className="flex items-end gap-2">
-            <div className="w-6 h-6 rounded bg-accent-500 flex items-center justify-center text-white text-xs font-bold shrink-0">A</div>
+            <div className="w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0"
+              style={{ background:'#0c1d33', color:'#4A9EFF' }}>A</div>
             <div className="bubble-assistant flex items-center gap-1.5 py-3">
-              {[0,150,300].map((d) => (
-                <span key={d} className="w-1.5 h-1.5 rounded-full bg-surface-500 animate-bounce" style={{ animationDelay: `${d}ms` }} />
-              ))}
+              {[0,150,300].map(d => <span key={d} className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background:'#303030', animationDelay:`${d}ms` }} />)}
             </div>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={sendMessage} className="p-3 bg-surface-800 border-t border-surface-700 flex gap-2">
-        <input
-          type="text" value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message..."
-          disabled={sending}
-          className="flex-1 px-3 py-2 bg-surface-700 border border-surface-600 rounded text-sm text-surface-200 placeholder-surface-500 focus:outline-none focus:border-surface-500 disabled:opacity-50"
-        />
-        <button
-          type="submit"
-          disabled={sending || !input.trim()}
-          className="px-4 py-2 bg-surface-100 hover:bg-white disabled:opacity-40 text-surface-900 text-sm font-medium rounded transition-colors"
-        >
-          Send
-        </button>
+      <form onSubmit={sendMessage} className="p-3 flex gap-2" style={{ background:'#0d0d0d', borderTop:'1px solid #1e1e1e' }}>
+        <input type="text" value={input} onChange={e=>setInput(e.target.value)}
+          placeholder="Type a message..." disabled={sending} className="input flex-1"
+          style={{ opacity:sending?0.6:1 }} />
+        <button type="submit" disabled={sending||!input.trim()} className="btn-primary px-4 py-2"
+          style={{ opacity: sending||!input.trim()?0.4:1 }}>Send</button>
       </form>
     </div>
   );
@@ -186,14 +138,17 @@ function EmbeddedWidget() {
   return (
     <div className="fixed bottom-6 right-6 z-50">
       {open && (
-        <div className="mb-4 w-[380px] h-[560px] rounded-xl shadow-2xl overflow-hidden border border-surface-700 flex flex-col">
+        <div className="mb-4 w-[380px] h-[560px] overflow-hidden flex flex-col"
+          style={{ border:'1px solid #1e1e1e', boxShadow:'0 25px 50px rgba(0,0,0,0.9)' }}>
           <ChatUI />
         </div>
       )}
-      <button
-        onClick={() => setOpen((p) => !p)}
-        className="w-12 h-12 rounded-full bg-surface-800 hover:bg-surface-700 border border-surface-600 text-surface-200 shadow-xl flex items-center justify-center text-xs font-bold tracking-tight transition-all active:scale-95"
-      >
+      <button onClick={()=>setOpen(p=>!p)} title="Chat with Ava"
+        style={{
+          width:52, height:52, background:'#0d0d0d', border:'1px solid #4A9EFF',
+          color:'#4A9EFF', fontSize:11, fontWeight:500, letterSpacing:'0.1em',
+          textTransform:'uppercase', cursor:'pointer', boxShadow:'0 0 20px rgba(74,158,255,0.15)',
+        }}>
         {open ? '✕' : 'AVA'}
       </button>
     </div>
