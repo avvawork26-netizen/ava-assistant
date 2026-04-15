@@ -2,50 +2,50 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 
 const NAV = [
-  { to: '/',              icon: '⊞', label: 'Dashboard' },
-  { to: '/leads',         icon: '👥', label: 'Leads' },
-  { to: '/conversations', icon: '💬', label: 'Conversations' },
-  { to: '/appointments',  icon: '📅', label: 'Appointments' },
-  { to: '/followups',     icon: '🔔', label: 'Follow-ups' },
+  { to: '/',              label: 'Dashboard'     },
+  { to: '/leads',         label: 'Leads'         },
+  { to: '/conversations', label: 'Conversations' },
+  { to: '/appointments',  label: 'Appointments'  },
+  { to: '/followups',     label: 'Follow-ups'    },
 ];
 
 export default function Sidebar() {
   return (
-    <aside className="w-60 flex-shrink-0 bg-navy-900 text-white flex flex-col shadow-xl">
+    <aside className="w-56 flex-shrink-0 bg-surface-950 border-r border-surface-800 flex flex-col">
       {/* Logo */}
-      <div className="px-6 pt-8 pb-6 border-b border-navy-700">
+      <div className="px-5 pt-7 pb-6 border-b border-surface-800">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-gold-500 flex items-center justify-center text-lg">
-            🏠
+          <div className="w-7 h-7 rounded bg-accent-500 flex items-center justify-center shrink-0">
+            <span className="text-white text-xs font-bold tracking-tight">AVA</span>
           </div>
           <div>
-            <div className="font-serif text-lg font-semibold leading-tight text-white">Ava</div>
-            <div className="text-xs text-navy-300 leading-tight">AI Realtor Assistant</div>
+            <div className="text-sm font-semibold text-surface-100 leading-tight tracking-tight">Ava</div>
+            <div className="text-xs text-surface-500 leading-tight">AI Realtor Assistant</div>
           </div>
         </div>
-        <div className="mt-3 px-2 py-1.5 bg-navy-800 rounded-lg">
-          <p className="text-xs text-navy-300">
-            <span className="text-gold-400 font-medium">Ayoub</span> · Orlando & Florida Coast
+        <div className="mt-4 px-2.5 py-1.5 bg-surface-800 rounded border border-surface-700">
+          <p className="text-xs text-surface-400">
+            <span className="text-accent-400 font-medium">Ayoub</span>
+            {' '}· Orlando & Florida Coast
           </p>
         </div>
       </div>
 
-      {/* Nav links */}
+      {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {NAV.map(({ to, icon, label }) => (
+        {NAV.map(({ to, label }) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              `flex items-center px-3 py-2 rounded text-sm font-medium transition-colors ${
                 isActive
-                  ? 'bg-gold-500 text-white shadow-sm'
-                  : 'text-navy-300 hover:bg-navy-800 hover:text-white'
+                  ? 'bg-surface-700 text-surface-100'
+                  : 'text-surface-500 hover:bg-surface-800 hover:text-surface-300'
               }`
             }
           >
-            <span className="text-base w-5 text-center">{icon}</span>
             {label}
           </NavLink>
         ))}
@@ -57,11 +57,14 @@ export default function Sidebar() {
           href="/chat"
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-navy-600 text-navy-300 hover:bg-navy-800 hover:text-white text-sm font-medium transition-colors"
+          className="flex items-center justify-center w-full py-2 rounded border border-surface-700 text-surface-400 hover:bg-surface-800 hover:text-surface-200 text-xs font-medium transition-colors tracking-wide uppercase"
         >
-          <span>🤖</span> Open Chat Widget
+          Open Chat Widget
         </a>
-        <p className="text-center text-xs text-navy-500 mt-2">Preview Ava's chat interface</p>
+        <div className="flex items-center justify-center gap-1.5 mt-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <p className="text-xs text-surface-600">Ava online</p>
+        </div>
       </div>
     </aside>
   );
