@@ -29,6 +29,17 @@ app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/followups', require('./routes/followups'));
 app.use('/api/chat', require('./routes/chat'));
 
+// Seed endpoint — POST /api/seed (runs seed script against live DB)
+app.post('/api/seed', (req, res) => {
+  try {
+    require('./database/seed');
+    res.json({ status: 'ok', message: 'Database seeded successfully' });
+  } catch (err) {
+    console.error('Seed error:', err);
+    res.status(500).json({ status: 'error', message: err.message });
+  }
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
